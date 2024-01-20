@@ -1,16 +1,10 @@
-# uts_unsia
+# UNSIA Tugas CRUD Flutter
 
-A new Flutter project.
+Gian Rachmat Pradipta - 220101020022 - Pemrograman Berbasis Perangkat Bergerak.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+[List Nilai] (screenshot/1. List.png)
+[Tambah] (screenshot/2. Tambah.png)
+[Hasil Tambah] (screenshot/3. Hasil Tambah.png)
+[Update] (screenshot/4. Update.png)
+[Hasil Update] (screenshot/4.1. Hasil Update.png)
+[Hasil Hapus] (screenshot/4.2. Hasil Hapus.png)

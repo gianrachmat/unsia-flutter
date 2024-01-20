@@ -41,6 +41,7 @@ dependencies:
   path: ^1.8.2
   sqflite: ^2.2.2
   state_notifier: ^1.0.0
+  fluttertoast: ^8.2.4
 
 dependency_overrides:
   watcher: ^1.1.0

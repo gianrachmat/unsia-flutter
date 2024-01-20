@@ -1,7 +1,7 @@
 import 'package:uts_unsia/data/entity/nilai_entity.dart';
 
 class Nilai {
-  late int id;
+  late int? id;
   late String nama;
   late String nim;
   late String prodi;

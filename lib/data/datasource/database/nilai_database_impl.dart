@@ -29,7 +29,8 @@ class NilaiDatabaseImpl implements NilaiDatabase {
   }
 
   @override
-  Future<void> deleteNilai(int id) async {
+  Future<void> deleteNilai(int? id) async {
+    if (id == null) return;
     final db = await database;
     await db.delete(_tableName, where: '$_columnId = ?', whereArgs: [id]);
   }
