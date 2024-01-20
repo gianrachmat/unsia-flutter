@@ -2,9 +2,9 @@
 
 Gian Rachmat Pradipta - 220101020022 - Pemrograman Berbasis Perangkat Bergerak.
 
-[List Nilai] (screenshot/1. List.png)
-[Tambah] (screenshot/2. Tambah.png)
-[Hasil Tambah] (screenshot/3. Hasil Tambah.png)
-[Update] (screenshot/4. Update.png)
-[Hasil Update] (screenshot/4.1. Hasil Update.png)
-[Hasil Hapus] (screenshot/4.2. Hasil Hapus.png)
+[List Nilai](screenshot/list.png)
+[Tambah](screenshot/tambah.png)
+[Hasil Tambah](screenshot/hasil_tambah.png)
+[Update](screenshot/update.png)
+[Hasil Update](screenshot/hasil_update.png)
+[Hasil Hapus](screenshot/hasil_hapus.png)
