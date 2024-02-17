@@ -12,7 +12,7 @@ class NilaiRepoImpl implements NilaiRepo {
   @override
   Future<Nilai> createNilai(Nilai nilai) async {
     debugPrint('nilai mhs ${nilai.mhs.toMap()}');
-    final nilaiEntity = await database.insertNilai(nilai.toMap());
+    final nilaiEntity = await database.insertNilai(nilai.toMap(insert: true));
     return Nilai.fromMap(nilaiEntity);
   }
 
@@ -29,7 +29,7 @@ class NilaiRepoImpl implements NilaiRepo {
 
   @override
   Future<void> updateNilai(Nilai nilai) async {
-    await database.updateNilai(nilai.toMap());
+    await database.updateNilai(nilai.toMap(insert: true));
   }
 
 }

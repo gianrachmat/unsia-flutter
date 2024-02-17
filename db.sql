@@ -1,4 +1,3 @@
-
 create TABLE nilai (
   id integer PRIMARY KEY not NULL,
   mhsId text,

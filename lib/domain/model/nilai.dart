@@ -28,13 +28,15 @@ class Nilai {
     nilaiUAS = map['nilaiUAS'];
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({bool insert = false}) {
     final Map<String, dynamic> map = {};
     map['id'] = id;
     map['mhsId'] = mhs.id;
-    map['nama'] = mhs.nama;
-    map['prodi'] = mhs.prodi;
-    map['nim'] = mhs.nim;
+    if (!insert) {
+      map['nama'] = mhs.nama;
+      map['prodi'] = mhs.prodi;
+      map['nim'] = mhs.nim;
+    }
     map['nilaiAbsen'] = nilaiAbsen;
     map['nilaiTugas'] = nilaiTugas;
     map['nilaiUTS'] = nilaiUTS;

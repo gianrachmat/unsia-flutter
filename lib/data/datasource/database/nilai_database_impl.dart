@@ -63,7 +63,7 @@ class NilaiDatabaseImpl implements NilaiDatabase {
         'from $tableName '
         'join ${mhs.tableName} on '
         '${mhs.tableName}.${mhs.columnId} = $tableName.$columnMhsId '
-        'where $tableName.$columnMhsId = ?',
+        'where $tableName.$columnId = ?',
         [id],
       );
       nilaiEntity = results.first;
