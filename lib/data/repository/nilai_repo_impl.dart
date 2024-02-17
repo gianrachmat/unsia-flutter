@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:uts_unsia/data/datasource/database/nilai_database.dart';
 import 'package:uts_unsia/domain/model/nilai.dart';
 import 'package:uts_unsia/domain/model/nilai_list.dart';
@@ -10,6 +11,7 @@ class NilaiRepoImpl implements NilaiRepo {
 
   @override
   Future<Nilai> createNilai(Nilai nilai) async {
+    debugPrint('nilai mhs ${nilai.mhs.toMap()}');
     final nilaiEntity = await database.insertNilai(nilai.toMap());
     return Nilai.fromMap(nilaiEntity);
   }

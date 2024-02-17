@@ -6,12 +6,12 @@ class NilaiList {
 
   NilaiList({required this.data});
 
-  NilaiList.fromMap(NilaiListEntity map) {
+  NilaiList.fromMap(DataListEntity map) {
     data = map.map((e) => Nilai.fromMap(e)).toList();
   }
 
-  NilaiListEntity toMap() {
-    List<NilaiEntity> list = [];
+  DataListEntity toMap() {
+    List<DataEntity> list = [];
     for (var element in data) {
       list.add(element.toMap());
     }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uts_unsia/presentation/view/nilai_list_page.dart';
+import 'package:uts_unsia/presentation/view/dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,17 +8,16 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'UTS UNSIA',
+      title: 'UAS UNSIA',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const NilaiListPage(title: 'Tugas Mobile Unsia'),
+      home: const Dashboard(),
     );
   }
 }

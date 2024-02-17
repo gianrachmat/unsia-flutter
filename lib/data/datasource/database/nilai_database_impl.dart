@@ -1,20 +1,22 @@
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uts_unsia/data/datasource/database/nilai_database.dart';
 import 'package:uts_unsia/data/entity/nilai_entity.dart';
 
+import 'mahasiswa_database_impl.dart' as mhs;
+
+const tableName = 'nilai_table';
+const columnId = 'id';
+const columnMhsId = 'mhsId';
+const columnNilaiAbsen = 'nilaiAbsen';
+const columnNilaiTugas = 'nilaiTugas';
+const columnNilaiUTS = 'nilaiUTS';
+const columnNilaiUAS = 'nilaiUAS';
+
 class NilaiDatabaseImpl implements NilaiDatabase {
   static const _databaseName = 'database';
-  static const _tableName = 'nilai_table';
   static const _databaseVersion = 1;
-  static const _columnId = 'id';
-  static const _columnNama = 'nama';
-  static const _columnNim = 'nim';
-  static const _columnProdi = 'prodi';
-  static const _columnNilaiAbsen = 'nilaiAbsen';
-  static const _columnNilaiTugas = 'nilaiTugas';
-  static const _columnNilaiUTS = 'nilaiUTS';
-  static const _columnNilaiUAS = 'nilaiUAS';
   static Database? _database;
 
   Future<Database> get database async {
@@ -23,32 +25,46 @@ class NilaiDatabaseImpl implements NilaiDatabase {
   }
 
   @override
-  Future<NilaiListEntity> allNilai() async {
+  Future<DataListEntity> allNilai() async {
     final db = await database;
-    return db.query(_tableName);
+    return db.rawQuery(
+      'select $tableName.*, ${mhs.tableName}.${mhs.columnNama}, '
+      '${mhs.tableName}.${mhs.columnNim}, '
+      '${mhs.tableName}.${mhs.columnProdi} '
+      'from $tableName '
+      'join ${mhs.tableName} on '
+      '${mhs.tableName}.${mhs.columnId} = $tableName.$columnMhsId'
+      '',
+    );
   }
 
   @override
   Future<void> deleteNilai(int? id) async {
     if (id == null) return;
     final db = await database;
-    await db.delete(_tableName, where: '$_columnId = ?', whereArgs: [id]);
+    await db.delete(tableName, where: '$columnId = ?', whereArgs: [id]);
   }
 
   @override
-  Future<NilaiEntity> insertNilai(NilaiEntity entity) async {
+  Future<DataEntity> insertNilai(DataEntity entity) async {
     final db = await database;
-    late final NilaiEntity nilaiEntity;
+    late final DataEntity nilaiEntity;
     await db.transaction((txn) async {
       final id = await txn.insert(
-        _tableName,
+        tableName,
         entity,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      final results = await txn.query(
-        _tableName,
-        where: '$_columnId = ?',
-        whereArgs: [id],
+      debugPrint('id $id, $entity');
+      final results = await txn.rawQuery(
+        'select $tableName.*, ${mhs.tableName}.${mhs.columnNama}, '
+        '${mhs.tableName}.${mhs.columnNim}, '
+        '${mhs.tableName}.${mhs.columnProdi} '
+        'from $tableName '
+        'join ${mhs.tableName} on '
+        '${mhs.tableName}.${mhs.columnId} = $tableName.$columnMhsId '
+        'where $tableName.$columnMhsId = ?',
+        [id],
       );
       nilaiEntity = results.first;
     });
@@ -56,13 +72,13 @@ class NilaiDatabaseImpl implements NilaiDatabase {
   }
 
   @override
-  Future<void> updateNilai(NilaiEntity entity) async {
+  Future<void> updateNilai(DataEntity entity) async {
     final db = await database;
     final int id = entity['id'];
     await db.update(
-      _tableName,
+      tableName,
       entity,
-      where: '$_columnId = ?',
+      where: '$columnId = ?',
       whereArgs: [id],
     );
   }
@@ -74,15 +90,13 @@ class NilaiDatabaseImpl implements NilaiDatabase {
     );
 
     await db.execute('''
-        CREATE TABLE IF NOT EXISTS $_tableName(
-          $_columnId INTEGER PRIMARY KEY NOT NULL,
-          $_columnNama TEXT NOT NULL,
-          $_columnNim TEXT NOT NULL,
-          $_columnProdi TEXT NOT NULL,
-          $_columnNilaiAbsen INTEGER NOT NULL,
-          $_columnNilaiTugas INTEGER NOT NULL,
-          $_columnNilaiUTS INTEGER NOT NULL,
-          $_columnNilaiUAS INTEGER NOT NULL
+        CREATE TABLE IF NOT EXISTS $tableName(
+          $columnId INTEGER PRIMARY KEY NOT NULL,
+          $columnMhsId INTEGER,
+          $columnNilaiAbsen INTEGER NOT NULL,
+          $columnNilaiTugas INTEGER NOT NULL,
+          $columnNilaiUTS INTEGER NOT NULL,
+          $columnNilaiUAS INTEGER NOT NULL
         )
         ''');
 

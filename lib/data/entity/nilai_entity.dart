@@ -1,2 +1,2 @@
-typedef NilaiEntity = Map<String, dynamic>;
-typedef NilaiListEntity = List<NilaiEntity>;
+typedef DataEntity = Map<String, dynamic>;
+typedef DataListEntity = List<DataEntity>;
