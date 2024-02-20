@@ -1,15 +1,14 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:uts_unsia/data/datasource/database/mahasiswa_database.dart';
-import 'package:uts_unsia/data/entity/nilai_entity.dart';
+import 'package:uts_unsia/data/datasource/database/habit_database.dart';
+import 'package:uts_unsia/data/entity/data_entity.dart';
 
-const tableName = 'mahasiswa_table';
+const tableName = 'habit_table';
 const columnId = 'id';
-const columnNama = 'nama';
-const columnNim = 'nim';
-const columnProdi = 'prodi';
+const columnHbName = 'habitName';
+const columnGoal = 'habitGoal';
 
-class MahasiswaDatabaseImpl implements MahasiswaDatabase {
+class HabitDatabaseImpl implements HabitDatabase {
   static const _databaseName = 'database';
   static const _databaseVersion = 1;
   static Database? _database;
@@ -20,22 +19,22 @@ class MahasiswaDatabaseImpl implements MahasiswaDatabase {
   }
 
   @override
-  Future<DataListEntity> allMahasiswa() async {
+  Future<DataListEntity> allHabit() async {
     final db = await database;
     return db.query(tableName);
   }
 
   @override
-  Future<void> deleteMahasiswa(int? id) async {
+  Future<void> deleteHabit(int? id) async {
     if (id == null) return;
     final db = await database;
     await db.delete(tableName, where: '$columnId = ?', whereArgs: [id]);
   }
 
   @override
-  Future<DataEntity> insertMahasiswa(DataEntity entity) async {
+  Future<DataEntity> insertHabit(DataEntity entity) async {
     final db = await database;
-    late final DataEntity mhsEntity;
+    late final DataEntity dataEntity;
     await db.transaction((txn) async {
       final id = await txn.insert(
         tableName,
@@ -47,13 +46,13 @@ class MahasiswaDatabaseImpl implements MahasiswaDatabase {
         where: '$columnId = ?',
         whereArgs: [id],
       );
-      mhsEntity = results.first;
+      dataEntity = results.first;
     });
-    return mhsEntity;
+    return dataEntity;
   }
 
   @override
-  Future<void> updateMahasiswa(DataEntity entity) async {
+  Future<void> updateHabit(DataEntity entity) async {
     final db = await database;
     final int id = entity['id'];
     await db.update(
@@ -73,9 +72,8 @@ class MahasiswaDatabaseImpl implements MahasiswaDatabase {
     await db.execute('''
         CREATE TABLE IF NOT EXISTS $tableName(
           $columnId INTEGER PRIMARY KEY NOT NULL,
-          $columnNama TEXT NOT NULL,
-          $columnNim TEXT NOT NULL,
-          $columnProdi TEXT NOT NULL
+          $columnHbName TEXT NOT NULL,
+          $columnGoal TEXT NOT NULL
         )
         ''');
 

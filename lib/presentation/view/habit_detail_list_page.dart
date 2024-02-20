@@ -1,56 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:uts_unsia/data/datasource/database/nilai_database_impl.dart';
-import 'package:uts_unsia/data/entity/nilai_entity.dart';
-import 'package:uts_unsia/data/repository/nilai_repo_impl.dart';
-import 'package:uts_unsia/domain/model/nilai.dart';
-import 'package:uts_unsia/domain/model/nilai_list.dart';
-import 'package:uts_unsia/domain/repo/nilai_repo.dart';
+import 'package:uts_unsia/data/datasource/database/habit_detail_database_impl.dart';
+import 'package:uts_unsia/data/entity/data_entity.dart';
+import 'package:uts_unsia/data/repository/habit_detail_repo_impl.dart';
+import 'package:uts_unsia/domain/model/habit_detail.dart';
+import 'package:uts_unsia/domain/model/habit_detail_list.dart';
+import 'package:uts_unsia/domain/repo/habit_detail_repo.dart';
 import 'package:uts_unsia/presentation/view/input_model_view.dart';
-import 'package:uts_unsia/presentation/view/mahasiswa_list_page.dart';
-import 'package:uts_unsia/presentation/view/tambah_nilai_page.dart';
+import 'package:uts_unsia/presentation/view/habit_list_page.dart';
+import 'package:uts_unsia/presentation/view/add_habit_detail_page.dart';
 
-class NilaiListPage extends StatefulWidget {
-  const NilaiListPage({super.key, required this.title});
+class HabitDetailListPage extends StatefulWidget {
+  const HabitDetailListPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<NilaiListPage> createState() => _NilaiListPageState();
+  State<HabitDetailListPage> createState() => _HabitDetailListPageState();
 }
 
-class _NilaiListPageState extends State<NilaiListPage> {
-  final List<String> _radioItems = [
-    'Sistem Informasi',
-    'Informatika',
-  ];
-  late String _selectedRadio;
-  final NilaiRepo _nilaiRepo = NilaiRepoImpl(NilaiDatabaseImpl());
-  NilaiList _nilaiList = NilaiList(data: []);
+class _HabitDetailListPageState extends State<HabitDetailListPage> {
+  final HabitDetailRepo _habitDetailRepo = HabitDetailRepoImpl(HabitDetailDatabaseImpl());
+  HabitDetailList _habitDetailList = HabitDetailList(data: []);
 
   @override
   void initState() {
     super.initState();
-    _selectedRadio = _radioItems.first;
-    _getNilai();
+    _getHabitDetail();
   }
 
-  Future<void> _getNilai() async {
-    NilaiList nilaiList = await _nilaiRepo.getNilaiList();
+  Future<void> _getHabitDetail() async {
+    HabitDetailList hdList = await _habitDetailRepo.getHabitDetailList();
     setState(() {
-      _nilaiList = nilaiList;
+      _habitDetailList = hdList;
     });
   }
 
   Widget _buildItem() {
-    return _nilaiList.data.isEmpty
+    return _habitDetailList.data.isEmpty
         ? const Center(child: Text('Belum ada data'))
         : ListView.builder(
-            itemCount: _nilaiList.data.length,
+            itemCount: _habitDetailList.data.length,
             itemBuilder: (context, i) {
-              debugPrint('nilai ${_nilaiList.data[i].toMap()}');
-              DataEntity nilai = _nilaiList.data[i].toMap();
+              debugPrint('habit detail ${_habitDetailList.data[i].toMap()}');
+              DataEntity hd = _habitDetailList.data[i].toMap();
               List<Widget> children = [];
-              nilai.forEach((key, value) {
+              hd.forEach((key, value) {
                 Widget child = Row(
                   children: [
                     Flexible(
@@ -71,14 +65,14 @@ class _NilaiListPageState extends State<NilaiListPage> {
                 onTap: () async {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => TambahListPage(
-                        title: 'Update Nilai',
+                      builder: (_) => AddHabitDetailPage(
+                        title: 'Update Habit',
                         isUpdate: true,
-                        nilai: Nilai.fromMap(nilai),
+                        habitDetail: HabitDetail.fromMap(hd),
                       ),
                     ),
                   );
-                  _getNilai();
+                  _getHabitDetail();
                 },
                 child: Card(
                   margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -110,16 +104,13 @@ class _NilaiListPageState extends State<NilaiListPage> {
         onPressed: () async {
           await Navigator.of(context).push(
             MaterialPageRoute(
-              // builder: (_) => const TambahListPage(
-              //   title: 'Tambah Nilai',
-              // ),
-              builder: (_) => const MahasiswaListPage(
-                title: 'Pilih Mahasiswa',
+              builder: (_) => const HabitListPage(
+                title: 'Choose Habit',
                 isSelect: true,
               ),
             ),
           );
-          _getNilai();
+          _getHabitDetail();
         },
         child: const Icon(Icons.add),
       ),

@@ -1,20 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:uts_unsia/data/datasource/database/nilai_database.dart';
-import 'package:uts_unsia/data/entity/nilai_entity.dart';
+import 'package:uts_unsia/data/datasource/database/habit_detail_database.dart';
+import 'package:uts_unsia/data/entity/data_entity.dart';
 
-import 'mahasiswa_database_impl.dart' as mhs;
+import 'habit_database_impl.dart' as hbt;
 
-const tableName = 'nilai_table';
+const tableName = 'habit_detail_table';
 const columnId = 'id';
-const columnMhsId = 'mhsId';
-const columnNilaiAbsen = 'nilaiAbsen';
-const columnNilaiTugas = 'nilaiTugas';
-const columnNilaiUTS = 'nilaiUTS';
-const columnNilaiUAS = 'nilaiUAS';
+const columnHabitId = 'habitId';
+const columnHabitDate = 'habitDate';
 
-class NilaiDatabaseImpl implements NilaiDatabase {
+class HabitDetailDatabaseImpl implements HabitDetailDatabase {
   static const _databaseName = 'database';
   static const _databaseVersion = 1;
   static Database? _database;
@@ -25,30 +22,30 @@ class NilaiDatabaseImpl implements NilaiDatabase {
   }
 
   @override
-  Future<DataListEntity> allNilai() async {
+  Future<DataListEntity> allHabitDetail() async {
     final db = await database;
     return db.rawQuery(
-      'select $tableName.*, ${mhs.tableName}.${mhs.columnNama}, '
-      '${mhs.tableName}.${mhs.columnNim}, '
-      '${mhs.tableName}.${mhs.columnProdi} '
+      'select $tableName.*, '
+      '${hbt.tableName}.${hbt.columnHbName}, '
+      '${hbt.tableName}.${hbt.columnGoal} '
       'from $tableName '
-      'join ${mhs.tableName} on '
-      '${mhs.tableName}.${mhs.columnId} = $tableName.$columnMhsId'
+      'join ${hbt.tableName} on '
+      '${hbt.tableName}.${hbt.columnId} = $tableName.$columnHabitId'
       '',
     );
   }
 
   @override
-  Future<void> deleteNilai(int? id) async {
+  Future<void> deleteHabitDetail(int? id) async {
     if (id == null) return;
     final db = await database;
     await db.delete(tableName, where: '$columnId = ?', whereArgs: [id]);
   }
 
   @override
-  Future<DataEntity> insertNilai(DataEntity entity) async {
+  Future<DataEntity> insertHabitDetail(DataEntity entity) async {
     final db = await database;
-    late final DataEntity nilaiEntity;
+    late final DataEntity dataEntity;
     await db.transaction((txn) async {
       final id = await txn.insert(
         tableName,
@@ -57,22 +54,22 @@ class NilaiDatabaseImpl implements NilaiDatabase {
       );
       debugPrint('id $id, $entity');
       final results = await txn.rawQuery(
-        'select $tableName.*, ${mhs.tableName}.${mhs.columnNama}, '
-        '${mhs.tableName}.${mhs.columnNim}, '
-        '${mhs.tableName}.${mhs.columnProdi} '
+        'select $tableName.*, '
+        '${hbt.tableName}.${hbt.columnHbName}, '
+        '${hbt.tableName}.${hbt.columnGoal} '
         'from $tableName '
-        'join ${mhs.tableName} on '
-        '${mhs.tableName}.${mhs.columnId} = $tableName.$columnMhsId '
+        'join ${hbt.tableName} on '
+        '${hbt.tableName}.${hbt.columnId} = $tableName.$columnHabitId '
         'where $tableName.$columnId = ?',
         [id],
       );
-      nilaiEntity = results.first;
+      dataEntity = results.first;
     });
-    return nilaiEntity;
+    return dataEntity;
   }
 
   @override
-  Future<void> updateNilai(DataEntity entity) async {
+  Future<void> updateHabitDetail(DataEntity entity) async {
     final db = await database;
     final int id = entity['id'];
     await db.update(
@@ -92,11 +89,8 @@ class NilaiDatabaseImpl implements NilaiDatabase {
     await db.execute('''
         CREATE TABLE IF NOT EXISTS $tableName(
           $columnId INTEGER PRIMARY KEY NOT NULL,
-          $columnMhsId INTEGER,
-          $columnNilaiAbsen INTEGER NOT NULL,
-          $columnNilaiTugas INTEGER NOT NULL,
-          $columnNilaiUTS INTEGER NOT NULL,
-          $columnNilaiUAS INTEGER NOT NULL
+          $columnHabitId INTEGER,
+          $columnHabitDate TEXT NOT NULL
         )
         ''');
 

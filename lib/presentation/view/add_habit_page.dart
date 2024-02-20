@@ -1,59 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uts_unsia/data/datasource/database/nilai_database_impl.dart';
-import 'package:uts_unsia/data/entity/nilai_entity.dart';
-import 'package:uts_unsia/data/repository/nilai_repo_impl.dart';
-import 'package:uts_unsia/domain/model/mahasiswa.dart';
-import 'package:uts_unsia/domain/model/nilai.dart';
-import 'package:uts_unsia/domain/repo/nilai_repo.dart';
+import 'package:uts_unsia/data/datasource/database/habit_database_impl.dart';
+import 'package:uts_unsia/data/entity/data_entity.dart';
+import 'package:uts_unsia/data/repository/habit_repo_impl.dart';
+import 'package:uts_unsia/domain/model/habit.dart';
+import 'package:uts_unsia/domain/repo/habit_repo.dart';
 import 'package:uts_unsia/presentation/view/input_model_view.dart';
 
-class TambahListPage extends StatefulWidget {
-  const TambahListPage({
+class AddHabitPage extends StatefulWidget {
+  const AddHabitPage({
     super.key,
     required this.title,
     this.isUpdate = false,
-    this.nilai,
     this.mhs,
+    this.isSelect = false,
   });
 
   final String title;
   final bool isUpdate;
-  final Nilai? nilai;
-  final Mahasiswa? mhs;
+  final Habit? mhs;
+  final bool isSelect;
 
   @override
-  State<TambahListPage> createState() => _TambahListPageState();
+  State<AddHabitPage> createState() => _AddHabitPageState();
 }
 
-class _TambahListPageState extends State<TambahListPage> {
-  final List<String> _radioItems = [
-    'Sistem Informasi',
-    'Informatika',
-  ];
-  late String _selectedRadio;
-  final NilaiRepo _nilaiRepo = NilaiRepoImpl(NilaiDatabaseImpl());
+class _AddHabitPageState extends State<AddHabitPage> {
+  final HabitRepo _mhsRepo = HabitRepoImpl(HabitDatabaseImpl());
   bool _loading = false;
   late List<InputModel> _models;
 
   @override
   void initState() {
     super.initState();
-    if (widget.isUpdate) {
-      _selectedRadio =
-          widget.mhs?.prodi ?? widget.nilai?.mhs.prodi ?? _radioItems.first;
-    } else {
-      _selectedRadio = _radioItems.first;
-    }
     _models = _generateModel();
-    debugPrint('${widget.mhs?.toMap()}');
+    debugPrint('is update? ${widget.isUpdate}');
   }
 
   void _pressButton(String button) {
     switch (button) {
       case 'Update':
-        _pressTambah();
-        break;
       case 'Tambah':
         _pressTambah();
         break;
@@ -69,7 +55,7 @@ class _TambahListPageState extends State<TambahListPage> {
     DataEntity entity = {};
     bool empty = false;
     if (widget.isUpdate) {
-      entity.addAll(widget.nilai!.toMap());
+      entity.addAll(widget.mhs!.toMap());
     }
     for (var im in _models) {
       if (im.type == InputType.text || im.type == InputType.number) {
@@ -84,22 +70,15 @@ class _TambahListPageState extends State<TambahListPage> {
           }
         }
       }
-      if (im.type == InputType.radio) {
-        entity[im.field] = _selectedRadio;
-      }
     }
-    if (widget.mhs != null) {
-      entity['mhsId'] = widget.mhs?.id;
-    }
-    debugPrint('entity mhs ${entity}');
     if (!empty) {
       setState(() {
         _loading = true;
       });
       if (widget.isUpdate) {
-        await _nilaiRepo.updateNilai(Nilai.fromMap(entity));
+        await _mhsRepo.updateHabit(Habit.fromMap(entity));
       } else {
-        await _nilaiRepo.createNilai(Nilai.fromMap(entity));
+        await _mhsRepo.createHabit(Habit.fromMap(entity));
       }
       setState(() {
         _loading = false;
@@ -111,11 +90,11 @@ class _TambahListPageState extends State<TambahListPage> {
   }
 
   Future<void> _pressHapus() async {
-    if (widget.nilai == null) return;
+    if (widget.mhs == null) return;
     setState(() {
       _loading = true;
     });
-    await _nilaiRepo.deleteNilai(widget.nilai!);
+    await _mhsRepo.deleteHabit(widget.mhs!);
     setState(() {
       _loading = false;
       Navigator.of(context).pop();
@@ -125,56 +104,18 @@ class _TambahListPageState extends State<TambahListPage> {
   List<InputModel> _generateModel() {
     return [
       InputModel(
-        'Nama',
+        'Habit Name',
         InputType.text,
-        readOnly: true,
+        field: columnHbName,
         controller: TextEditingController(),
-        field: 'nama',
-        value: widget.mhs?.nama ?? widget.nilai?.mhs.nama ?? '',
+        value: widget.mhs?.habitName ?? '',
       ),
       InputModel(
-        'NIM',
+        'Habit Goal',
         InputType.text,
-        readOnly: true,
+        field: columnGoal,
         controller: TextEditingController(),
-        field: 'nim',
-        value: widget.mhs?.nim ?? widget.nilai?.mhs.nim ?? '',
-      ),
-      InputModel(
-        'Prodi',
-        InputType.text,
-        readOnly: true,
-        controller: TextEditingController(),
-        field: 'prodi',
-        value: widget.mhs?.prodi ?? widget.nilai?.mhs.prodi ?? '',
-      ),
-      InputModel(
-        'Nilai Absen',
-        InputType.number,
-        field: 'nilaiAbsen',
-        controller: TextEditingController(),
-        value: "${widget.nilai?.nilaiAbsen ?? ''}",
-      ),
-      InputModel(
-        'Nilai Tugas/Praktikum',
-        InputType.number,
-        field: 'nilaiTugas',
-        controller: TextEditingController(),
-        value: "${widget.nilai?.nilaiTugas ?? ''}",
-      ),
-      InputModel(
-        'Nilai UTS',
-        InputType.number,
-        field: 'nilaiUTS',
-        controller: TextEditingController(),
-        value: "${widget.nilai?.nilaiUTS ?? ''}",
-      ),
-      InputModel(
-        'Nilai UAS',
-        InputType.number,
-        field: 'nilaiUAS',
-        controller: TextEditingController(),
-        value: "${widget.nilai?.nilaiUAS ?? ''}",
+        value: widget.mhs?.habitGoal ?? '',
       ),
       InputModel(
         '',
@@ -196,7 +137,9 @@ class _TambahListPageState extends State<TambahListPage> {
     }).toList();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      child: Column(children: model),
+      child: Column(
+        children: model,
+      ),
     );
   }
 

@@ -138,6 +138,7 @@ class InputModel {
   List<String> radioItem;
   List<String> buttons;
   TextEditingController? controller;
+  String? date;
 
   InputModel(
     this.title,
@@ -148,6 +149,7 @@ class InputModel {
     this.radioItem = const [],
     this.buttons = const [],
     this.controller,
+    this.date,
   });
 }
 

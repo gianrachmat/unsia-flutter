@@ -1,55 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uts_unsia/data/datasource/database/mahasiswa_database_impl.dart';
-import 'package:uts_unsia/data/entity/nilai_entity.dart';
-import 'package:uts_unsia/data/repository/mhs_repo_impl.dart';
-import 'package:uts_unsia/domain/model/mahasiswa.dart';
-import 'package:uts_unsia/domain/repo/mhs_repo.dart';
+import 'package:uts_unsia/data/datasource/database/habit_database_impl.dart';
+import 'package:uts_unsia/data/datasource/database/habit_detail_database_impl.dart';
+import 'package:uts_unsia/data/entity/data_entity.dart';
+import 'package:uts_unsia/data/repository/habit_detail_repo_impl.dart';
+import 'package:uts_unsia/domain/model/habit.dart';
+import 'package:uts_unsia/domain/model/habit_detail.dart';
+import 'package:uts_unsia/domain/repo/habit_detail_repo.dart';
+import 'package:uts_unsia/helper/utils.dart';
 import 'package:uts_unsia/presentation/view/input_model_view.dart';
 
-class TambahMhsListPage extends StatefulWidget {
-  const TambahMhsListPage({
+class AddHabitDetailPage extends StatefulWidget {
+  const AddHabitDetailPage({
     super.key,
     required this.title,
     this.isUpdate = false,
-    this.mhs,
-    this.isSelect = false,
+    this.habitDetail,
+    this.habit,
   });
 
   final String title;
   final bool isUpdate;
-  final Mahasiswa? mhs;
-  final bool isSelect;
+  final HabitDetail? habitDetail;
+  final Habit? habit;
 
   @override
-  State<TambahMhsListPage> createState() => _TambahMhsListPageState();
+  State<AddHabitDetailPage> createState() => _AddHabitDetailPageState();
 }
 
-class _TambahMhsListPageState extends State<TambahMhsListPage> {
-  final List<String> _radioItems = [
-    'Sistem Informasi',
-    'Informatika',
-  ];
-  late String _selectedRadio;
-  final MhsRepo _mhsRepo = MhsRepoImpl(MahasiswaDatabaseImpl());
+class _AddHabitDetailPageState extends State<AddHabitDetailPage> {
+  final HabitDetailRepo _nilaiRepo = HabitDetailRepoImpl(HabitDetailDatabaseImpl());
   bool _loading = false;
   late List<InputModel> _models;
 
   @override
   void initState() {
     super.initState();
-    if (widget.isUpdate) {
-      _selectedRadio = widget.mhs?.prodi ?? _radioItems.first;
-    } else {
-      _selectedRadio = _radioItems.first;
-    }
     _models = _generateModel();
-    debugPrint('is update? ${widget.isUpdate}');
+    debugPrint('${widget.habit?.toMap()}');
   }
 
   void _pressButton(String button) {
     switch (button) {
       case 'Update':
+        _pressTambah();
+        break;
       case 'Tambah':
         _pressTambah();
         break;
@@ -65,7 +60,7 @@ class _TambahMhsListPageState extends State<TambahMhsListPage> {
     DataEntity entity = {};
     bool empty = false;
     if (widget.isUpdate) {
-      entity.addAll(widget.mhs!.toMap());
+      entity.addAll(widget.habitDetail!.toMap());
     }
     for (var im in _models) {
       if (im.type == InputType.text || im.type == InputType.number) {
@@ -76,22 +71,29 @@ class _TambahMhsListPageState extends State<TambahMhsListPage> {
           if (im.type == InputType.number) {
             entity[im.field] = int.tryParse(im.controller!.text);
           } else {
-            entity[im.field] = im.controller!.text;
+            String text;
+            if (im.field == columnHabitDate) {
+              text = getDate();
+            } else {
+              text = im.controller!.text;
+            }
+            entity[im.field] = text;
           }
         }
       }
-      if (im.type == InputType.radio) {
-        entity[im.field] = _selectedRadio;
-      }
     }
+    if (widget.habit != null) {
+      entity[columnHabitId] = widget.habit?.id;
+    }
+    debugPrint('$runtimeType entity $entity');
     if (!empty) {
       setState(() {
         _loading = true;
       });
       if (widget.isUpdate) {
-        await _mhsRepo.updateMhs(Mahasiswa.fromMap(entity));
+        await _nilaiRepo.updateHabitDetail(HabitDetail.fromMap(entity));
       } else {
-        await _mhsRepo.createMhs(Mahasiswa.fromMap(entity));
+        await _nilaiRepo.createHabitDetail(HabitDetail.fromMap(entity));
       }
       setState(() {
         _loading = false;
@@ -103,11 +105,11 @@ class _TambahMhsListPageState extends State<TambahMhsListPage> {
   }
 
   Future<void> _pressHapus() async {
-    if (widget.mhs == null) return;
+    if (widget.habitDetail == null) return;
     setState(() {
       _loading = true;
     });
-    await _mhsRepo.deleteMhs(widget.mhs!);
+    await _nilaiRepo.deleteHabitDetail(widget.habitDetail!);
     setState(() {
       _loading = false;
       Navigator.of(context).pop();
@@ -115,27 +117,36 @@ class _TambahMhsListPageState extends State<TambahMhsListPage> {
   }
 
   List<InputModel> _generateModel() {
+    String date = "${widget.habitDetail != null ? widget.habitDetail?.habitDate : getDate()}";
+    date = toEDMY(date);
     return [
       InputModel(
-        'Nama',
+        'Habit Name',
         InputType.text,
-        field: 'nama',
+        readOnly: true,
         controller: TextEditingController(),
-        value: widget.mhs?.nama ?? '',
+        field: columnHbName,
+        value: widget.habit?.habitName ??
+            widget.habitDetail?.habit.habitName ??
+            '',
       ),
       InputModel(
-        'NIM',
+        'Habit Goal',
         InputType.text,
-        field: 'nim',
+        readOnly: true,
         controller: TextEditingController(),
-        value: widget.mhs?.nim ?? '',
+        field: columnGoal,
+        value: widget.habit?.habitGoal ??
+            widget.habitDetail?.habit.habitGoal ??
+            '',
       ),
       InputModel(
-        'Prodi',
-        InputType.radio,
-        radioItem: _radioItems,
-        field: 'prodi',
-        value: widget.mhs?.prodi ?? '',
+        'Habit Date',
+        InputType.text,
+        field: columnHabitDate,
+        readOnly: true,
+        controller: TextEditingController(),
+        value: date,
       ),
       InputModel(
         '',
@@ -152,18 +163,12 @@ class _TambahMhsListPageState extends State<TambahMhsListPage> {
     List<Widget> model = _models.map((InputModel e) {
       return InputModelView(
         model: e,
-        selectedRadio: _selectedRadio,
-        onRadioChanged: (selected) {
-          _selectedRadio = selected ?? '';
-        },
         onButtonPressed: _pressButton,
       );
     }).toList();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      child: Column(
-        children: model,
-      ),
+      child: Column(children: model),
     );
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:uts_unsia/presentation/view/mahasiswa_list_page.dart';
-import 'package:uts_unsia/presentation/view/nilai_list_page.dart';
+import 'package:uts_unsia/presentation/view/habit_list_page.dart';
+import 'package:uts_unsia/presentation/view/habit_detail_list_page.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -25,14 +25,14 @@ class _DashboardState extends State<Dashboard> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.group),
-            selectedIcon: Icon(Icons.group, color: Colors.white),
-            label: 'Mahasiswa',
+            icon: Icon(Icons.edit_calendar_rounded),
+            selectedIcon: Icon(Icons.edit_calendar_rounded, color: Colors.white),
+            label: 'Habit',
           ),
           NavigationDestination(
-            icon: Icon(Icons.list_alt),
-            selectedIcon: Icon(Icons.list_alt, color: Colors.white),
-            label: 'Nilai',
+            icon: Icon(Icons.done_all_rounded),
+            selectedIcon: Icon(Icons.done_all_rounded, color: Colors.white),
+            label: 'Detail',
           ),
         ],
       ),
@@ -42,8 +42,8 @@ class _DashboardState extends State<Dashboard> {
 
   List<Widget> _buildPage() {
     return [
-      const MahasiswaListPage(title: 'Daftar Mahasiswa'),
-      const NilaiListPage(title: 'Daftar Nilai Mahasiswa'),
+      const HabitListPage(title: 'Your Habit'),
+      const HabitDetailListPage(title: 'Habit Detail'),
     ];
   }
 }

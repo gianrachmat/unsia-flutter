@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:uts_unsia/data/datasource/database/mahasiswa_database_impl.dart';
-import 'package:uts_unsia/data/entity/nilai_entity.dart';
-import 'package:uts_unsia/data/repository/mhs_repo_impl.dart';
-import 'package:uts_unsia/domain/model/mahasiswa.dart';
-import 'package:uts_unsia/domain/model/mahasiswa_list.dart';
-import 'package:uts_unsia/domain/repo/mhs_repo.dart';
+import 'package:uts_unsia/data/datasource/database/habit_database_impl.dart';
+import 'package:uts_unsia/data/entity/data_entity.dart';
+import 'package:uts_unsia/data/repository/habit_repo_impl.dart';
+import 'package:uts_unsia/domain/model/habit.dart';
+import 'package:uts_unsia/domain/model/habit_list.dart';
+import 'package:uts_unsia/domain/repo/habit_repo.dart';
 import 'package:uts_unsia/presentation/view/input_model_view.dart';
-import 'package:uts_unsia/presentation/view/tambah_mahasiswa_page.dart';
-import 'package:uts_unsia/presentation/view/tambah_nilai_page.dart';
+import 'package:uts_unsia/presentation/view/add_habit_page.dart';
+import 'package:uts_unsia/presentation/view/add_habit_detail_page.dart';
 
-class MahasiswaListPage extends StatefulWidget {
-  const MahasiswaListPage({
+class HabitListPage extends StatefulWidget {
+  const HabitListPage({
     super.key,
     required this.title,
     this.isSelect = false,
@@ -20,39 +20,33 @@ class MahasiswaListPage extends StatefulWidget {
   final bool isSelect;
 
   @override
-  State<MahasiswaListPage> createState() => _MahasiswaListPage();
+  State<HabitListPage> createState() => _HabitListPage();
 }
 
-class _MahasiswaListPage extends State<MahasiswaListPage> {
-  final List<String> _radioItems = [
-    'Sistem Informasi',
-    'Informatika',
-  ];
-  late String _selectedRadio;
-  final MhsRepo _mhsRepo = MhsRepoImpl(MahasiswaDatabaseImpl());
-  MahasiswaList _mhsList = MahasiswaList(data: []);
+class _HabitListPage extends State<HabitListPage> {
+  final HabitRepo _habitRepo = HabitRepoImpl(HabitDatabaseImpl());
+  HabitList _habitList = HabitList(data: []);
 
   @override
   void initState() {
     super.initState();
-    _selectedRadio = _radioItems.first;
-    _getMhs();
+    _getHabit();
   }
 
-  Future<void> _getMhs() async {
-    MahasiswaList mhsList = await _mhsRepo.getMhsList();
+  Future<void> _getHabit() async {
+    HabitList mhsList = await _habitRepo.getHabitList();
     setState(() {
-      _mhsList = mhsList;
+      _habitList = mhsList;
     });
   }
 
   Widget _buildItem() {
-    return _mhsList.data.isEmpty
+    return _habitList.data.isEmpty
         ? const Center(child: Text('Belum ada data'))
         : ListView.builder(
-            itemCount: _mhsList.data.length,
+            itemCount: _habitList.data.length,
             itemBuilder: (context, i) {
-              DataEntity mhs = _mhsList.data[i].toMap();
+              DataEntity mhs = _habitList.data[i].toMap();
               List<Widget> children = [];
               mhs.forEach((key, value) {
                 Widget child = Row(
@@ -74,13 +68,13 @@ class _MahasiswaListPage extends State<MahasiswaListPage> {
               return GestureDetector(
                 onTap: () async {
                   Widget builder = widget.isSelect
-                      ? TambahListPage(
-                          title: 'Tambah Nilai Mahasiswa',
-                          mhs: Mahasiswa.fromMap(mhs),
+                      ? AddHabitDetailPage(
+                          title: 'Add Habit Detail',
+                          habit: Habit.fromMap(mhs),
                         )
-                      : TambahMhsListPage(
-                          title: 'Tambah Mahasiswa',
-                          mhs: Mahasiswa.fromMap(mhs),
+                      : AddHabitPage(
+                          title: 'Add Habit',
+                          mhs: Habit.fromMap(mhs),
                           isUpdate: true,
                         );
                   await Navigator.of(context).push(
@@ -93,7 +87,7 @@ class _MahasiswaListPage extends State<MahasiswaListPage> {
                       Navigator.of(context).pop();
                     });
                   } else {
-                    _getMhs();
+                    _getHabit();
                   }
                 },
                 child: Card(
@@ -126,12 +120,12 @@ class _MahasiswaListPage extends State<MahasiswaListPage> {
         onPressed: () async {
           await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => const TambahMhsListPage(
-                title: 'Tambah Mahasiswa',
+              builder: (_) => const AddHabitPage(
+                title: 'Add Habit',
               ),
             ),
           );
-          _getMhs();
+          _getHabit();
         },
         child: const Icon(Icons.add),
       ),
