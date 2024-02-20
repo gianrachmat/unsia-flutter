@@ -54,7 +54,7 @@ class _HabitListPage extends State<HabitListPage> {
                     Flexible(
                       fit: FlexFit.tight,
                       flex: 2,
-                      child: Text(key.capitalize()),
+                      child: Text(key.camelToSentence()),
                     ),
                     Flexible(
                       fit: FlexFit.tight,
